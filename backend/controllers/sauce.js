@@ -76,13 +76,12 @@ exports.viewSauce = (req, res, next) => {                                      /
 
 exports.updateSauce = (req, res, next) => {
 
-
     let sauce = new Sauce({ _id: req.params._id });
     if (req.file) {
         const url = req.protocol + '://' + req.get('host');
         req.body.sauce = JSON.parse(req.body.sauce);
         sauce = {
-            //_id: req.params._id,
+            _id: req.params._id,
             name : req.body.sauce.name,
             manufacturer : req.body.sauce.manufacturer,
             description : req.body.sauce.description,
@@ -96,7 +95,7 @@ exports.updateSauce = (req, res, next) => {
         };
     } else{
         sauce = {
-            //_id: req.params._id,
+            _id: req.params._id,
             name : req.body.name,
             manufacturer : req.body.manufacturer,
             description : req.body.description,
@@ -147,10 +146,44 @@ exports.deleteSauce = (req, res, next) => {
         });
 
     console.log("Delete Individual Sauce - Product");
-
 };
 
+exports.likeSauce = async(req, res, next) => {
 
+    const like = await(req.body.like);
+    //number sent from front end (1 or 0 or -1)
+      console.log("like is "+like);
+        switch(like) {
+          /*******like******/
+          case '1':
+          // console.log("case 1");
+            Sauce.findOneAndUpdate({_id: req.params.id}, 
+              function(err, result) {
+              
+              if (err) {
+                res.send(err);
+              } else {
+                res.send(result);
+              }
+              });
+              break;
+            /**********dislike**********/
+           case '-1':
+             //console.log("case -1");
+              Sauce.findOneAndUpdate({_id: req.params.id},
+                {$addToSet:{usersDisliked: currentUser}, $inc:{ dislikes: 1 }}, {new: true}, function(err, result) {
+                  
+                if (err) {
+                  res.send(err);
+                } else {
+                  res.send(result);
+                }
+                });
+               break;
+          default:
+          console.log("default");
+        }
+      }
 
     
       

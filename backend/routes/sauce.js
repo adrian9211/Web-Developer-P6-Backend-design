@@ -23,7 +23,7 @@ router.put('/:id', auth, multer, SauceCtrl.updateSauce);
 //DELETE Route Remove single , unique Sauces - Products from database 
 router.delete('/:id', auth, SauceCtrl.deleteSauce);
 
-//PUT Route Assign Like to single , unique Sauces - Products from database 
-//router.put('/:id/like', auth, SauceCtrl.likeSauce);
+//POST Route Assign Like to single , unique Sauces - Products from database 
+router.post('/:id/like', auth, SauceCtrl.likeSauce);
 
 module.exports = router;
