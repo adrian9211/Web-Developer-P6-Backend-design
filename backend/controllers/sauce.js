@@ -148,27 +148,33 @@ exports.likeSauce = (req, res, next) => {
     }).then(sauce => {
         // User liked and description
       if (req.body.like == 1) {
-        sauce.usersLiked.push(req.body.userId)
-        sauce.likes += req.body.like
+        sauce.usersLiked
+            .push(req.body.userId)
+            sauce.likes += req.body.like
       } 
         else if (
-        req.body.like == 0 &&
-        sauce.usersLiked.includes(req.body.userId)
-      ) {
-        sauce.usersLiked.remove(req.body.userId)
-        sauce.likes -= 1
+        req.body.like == 0 && sauce.usersLiked
+            .includes(req.body.userId)
+      ) 
+      {
+        sauce.usersLiked
+            .remove(req.body.userId)
+            sauce.likes -= 1
       } 
     //   User disliked and description
       else if (req.body.like == -1) {
-        sauce.usersDisliked.push(req.body.userId)
-        sauce.dislikes += 1
+        sauce.usersDisliked
+            .push(req.body.userId)
+            sauce.dislikes += 1
       } 
       else if (
-        req.body.like == 0 &&
-        sauce.usersDisliked.includes(req.body.userId)
-      ) {
-        sauce.usersDisliked.remove(req.body.userId)
-        sauce.dislikes -= 1
+        req.body.like == 0 && sauce.usersDisliked
+            .includes(req.body.userId)
+      ) 
+      {
+        sauce.usersDisliked
+            .remove(req.body.userId)
+            sauce.dislikes -= 1
       }
       sauce.save().then(() => {
           res.status(201).json({
