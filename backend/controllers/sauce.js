@@ -1,5 +1,4 @@
 const Sauce = require('../models/sauce');
-global.atob = require("atob");
 const fs = require('fs');                                                           // Access to filesystem fs stands for file system
 
 
@@ -16,6 +15,7 @@ exports.createSauce = (req, res, next) => {                                     
         manufacturer: req.body.sauce.manufacturer,
         description: req.body.sauce.description,
         imageUrl: url + '/images/' + req.file.filename,
+        mainPepper: req.body.sauce.mainPepper,
         heat: req.body.sauce.heat,
         likes: req.body.sauce.likes,
         dislikes: req.body.sauce.dislikes,
@@ -26,7 +26,7 @@ exports.createSauce = (req, res, next) => {                                     
     sauce.save().then(
         () => {
             res.status(201).json({
-                message: 'Individual Sauce - Product Created!'
+                message: 'Individual Sauce - Product Created!'                      // Message displayed in browser console mode
             });
         }
     ).catch(
@@ -37,13 +37,13 @@ exports.createSauce = (req, res, next) => {                                     
         }
     );
 
-    console.log("New sauce created");
-};
+    console.log("New sauce created");                                           // Message displayed in browser console mode
+};  
 
 exports.viewAllSauces = (req, res, next) => {                                   // Dispaly All Sauces from database
     Sauce.find().then(
-        (sauce) => {                                  // Parametr sauce
-            res.status(200).json(sauce);                // Display sauce
+        (sauce) => {                                                            // Parametr sauce
+            res.status(200).json(sauce);                                        // Display sauce
         }
     ).catch(
         (error) => {
@@ -53,15 +53,15 @@ exports.viewAllSauces = (req, res, next) => {                                   
         }
     );
 
-    console.log("Display ALL SAUCES");
+    console.log("Display ALL SAUCES");                                          // Message displayed in browser console mode
 };
 
 exports.viewSauce = (req, res, next) => {                                      // // Dispaly IndividualSauces from database
     Sauce.findOne({
         _id: req.params.id
     }).then(
-        (sauce) => {                                  // Parametr sauce
-            res.status(200).json(sauce);                // Display sauce
+        (sauce) => {                                                            // Parametr sauce
+            res.status(200).json(sauce);                                        // Display sauce
         }
     ).catch(
         (error) => {
@@ -71,23 +71,26 @@ exports.viewSauce = (req, res, next) => {                                      /
         }
     );
 
-    console.log("Display Individual Sauce - Product");
+    console.log("Display Individual Sauce - Product");                          // Message displayed in browser console mode
 };
 
-exports.updateSauce = (req, res, next) => {
-    Sauce.findOne({ _id: req.params.id })
+exports.updateSauce = (req, res, next) => {                                     // Make update for individual product in database.
+    Sauce.findOne(
+                    { _id: req.params.id }                                      // Find one item by id
+                )
     .then(sauce => {
       if (req.file) {
         const url = req.protocol + '://' + req.get('host');
         req.body.sauce = JSON.parse(req.body.sauce)
-        sauce = {
-          _id: req.params.id,
-          userId: req.body.sauce.userId,
-          name: req.body.sauce.name,
-          description: req.body.sauce.description,
-          manufacturer: req.body.sauce.manufacturer,
-          imageUrl: url + req.file.key,                         // Didn't attached into else section because do not require update image
-          heat: req.body.sauce.heat
+        sauce = {                                                               
+          _id: req.params.id,                                                   //the unique identifier created by MongoDB
+          userId: req.body.sauce.userId,                                        //the MongoDB unique identifier for the user who created the sauce
+          name: req.body.sauce.name,                                            //name of the sauce
+          description: req.body.sauce.description,                              //description of the sauce
+          mainPepper: req.body.sauce.mainPepper,                                //the main pepper ingredient in the sauce
+          manufacturer: req.body.sauce.manufacturer,                            //manufacturer of the sauce
+          imageUrl : url + '/images/' + req.file.filename,                      // Didn't attached into else section because do not require update image
+          heat: req.body.sauce.heat                                             //number between 1 and 10 describing the sauce
         }
       } else {
         sauce = {
@@ -95,6 +98,7 @@ exports.updateSauce = (req, res, next) => {
           userId: req.body.userId,
           name: req.body.name,
           description: req.body.description,
+          mainPepper: req.body.mainPepper,
           manufacturer: req.body.manufacturer,
           heat: req.body.heat
         }
@@ -103,7 +107,7 @@ exports.updateSauce = (req, res, next) => {
       Sauce.updateOne({ _id: req.params.id }, sauce)
         .then(() => {
           res.status(201).json({
-            message: 'Product updated!'
+            message: 'Product updated!'                                         // Message displayed in browser console mode
           })
         })
         .catch(error => {
@@ -113,6 +117,7 @@ exports.updateSauce = (req, res, next) => {
         })
     })
   }
+
 exports.deleteSauce = (req, res, next) => {
 
     Sauce.findOne({
@@ -123,7 +128,7 @@ exports.deleteSauce = (req, res, next) => {
                     Sauce.deleteOne({_id: req.params.id}).then(
                         () => {
                             res.status(200).json({
-                                message: 'Removed!'
+                                message: 'Removed!'                             // Message displayed in browser console mode
                             });
                         }
                     ).catch(
@@ -138,47 +143,47 @@ exports.deleteSauce = (req, res, next) => {
             );
         });
 
-    console.log("Delete Individual Sauce - Product");
+    console.log("Delete Individual Sauce - Product");                           // Message displayed in browser console mode
 };
 
 exports.likeSauce = (req, res, next) => {
     req.body = req.body
-    Sauce.findOne({ 
+    Sauce.findOne({                                                             // Find one item by id
         _id: req.params.id 
-    }).then(sauce => {
+    }).then(sauce => {                                                          
         // User liked and description
-      if (req.body.like == 1) {
+      if (req.body.like == 1) {                                                 // Check statement and go forward when true. 
         sauce.usersLiked
             .push(req.body.userId)
             sauce.likes += req.body.like
       } 
-        else if (
+        else if (                                                               // Check statement and go forward when true.
         req.body.like == 0 && sauce.usersLiked
             .includes(req.body.userId)
       ) 
       {
-        sauce.usersLiked
+        sauce.usersLiked                                                        // Check statement and go forward when true if no run brackets below.
             .remove(req.body.userId)
             sauce.likes -= 1
       } 
     //   User disliked and description
-      else if (req.body.like == -1) {
+      else if (req.body.like == -1) {                                           // Check statement and go forward when true.
         sauce.usersDisliked
             .push(req.body.userId)
             sauce.dislikes += 1
       } 
-      else if (
+      else if (                                                                 // Check statement and go forward when true.
         req.body.like == 0 && sauce.usersDisliked
             .includes(req.body.userId)
       ) 
-      {
+      {                                                                         // Check statement and go forward when true if no run brackets below.
         sauce.usersDisliked
             .remove(req.body.userId)
             sauce.dislikes -= 1
       }
       sauce.save().then(() => {
           res.status(201).json({
-            message: 'Preference sended to the system.'
+            message: 'Preference sended to the system.'                         // Message displayed in browser console mode
           })
         }).catch(error => {
             res.status(400).json({

@@ -5,7 +5,6 @@ const router = express.Router();
 const auth = require('../middleware/auth');                             // Import auth from //middleware/auth
 const multer = require('../middleware/multer-config');                  // Import multer from middleware/multer-config
 const SauceCtrl = require('../controllers/sauce');
-
 const Sauce = require('../models/sauce');
 
 // POST Route add new sauce to database
